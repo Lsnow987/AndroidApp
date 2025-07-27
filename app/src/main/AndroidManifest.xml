@@ -5,7 +5,7 @@
     <!-- Contact access -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
-    <!-- SMS access - CRITICAL for SMS extraction -->
+    <!-- SMS access -->
     <uses-permission android:name="android.permission.READ_SMS" />
 
     <!-- Call log access -->
@@ -14,18 +14,22 @@
     <!-- Calendar access -->
     <uses-permission android:name="android.permission.READ_CALENDAR" />
 
+    <!-- Location access for location history -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- Photos and media access -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <!-- Hardware features -->
     <uses-feature
         android:name="android.hardware.telephony"
         android:required="false" />
 
     <!-- Storage access for saving exported files -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
-
-    <!-- For Android 13+ media access -->
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
     <!-- Network access (optional - for cloud export) -->
     <uses-permission android:name="android.permission.INTERNET" />

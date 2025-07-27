@@ -10,10 +10,10 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Data Extractor"
+        android:text="Complete Data Extractor"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:layout_marginBottom="32dp" />
+        android:layout_marginBottom="24dp" />
 
     <TextView
         android:id="@+id/statusText"
@@ -23,39 +23,72 @@
         android:textSize="16sp"
         android:gravity="center"
         android:layout_marginBottom="24dp"
-        android:minHeight="80dp" />
+        android:minHeight="100dp" />
 
     <Button
         android:id="@+id/requestPermissionsButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Request Permissions"
-        android:layout_marginBottom="16dp"
+        android:text="🔐 Request All Permissions"
+        android:layout_marginBottom="8dp"
         android:visibility="gone" />
+
+    <Button
+        android:id="@+id/recheckButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="🔄 Recheck Permissions"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="#9C27B0"
+        android:textSize="12sp" />
 
     <Button
         android:id="@+id/extractButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Extract All Data (Contacts, SMS, Calls, Calendar)"
+        android:text="📊 Extract All Data\n(Contacts, SMS, Calls, Calendar, Photos Metadata, Device Info, Location, Apps)"
         android:enabled="false"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="12dp"
+        android:minHeight="70dp"
+        android:textSize="14sp" />
+
+    <Button
+        android:id="@+id/extractPhotosButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="📸 Extract ALL Photos + Metadata\n(WARNING: This may take a very long time and use lots of storage)"
+        android:enabled="false"
+        android:layout_marginBottom="16dp"
+        android:minHeight="70dp"
+        android:textSize="14sp"
+        android:backgroundTint="#FF9800" />
 
     <Button
         android:id="@+id/shareButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="📤 Share File to Computer"
+        android:text="📤 Share Data File to Computer"
         android:visibility="gone"
-        android:backgroundTint="#4CAF50" />
+        android:backgroundTint="#4CAF50"
+        android:layout_marginBottom="8dp" />
+
+    <Button
+        android:id="@+id/sharePhotosButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="📦 Share Photos ZIP to Computer"
+        android:visibility="gone"
+        android:backgroundTint="#FF5722"
+        android:layout_marginBottom="16dp" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Note: Extracts contacts, SMS messages, call logs, and calendar events. Data saved as JSON file."
+        android:text="• Regular extraction: Creates one JSON file with all data\n• Photo extraction: Creates ZIP file with ALL photos + metadata\n• No limits on photo count or file sizes\n• Data saved to Documents folder as compressed ZIP"
         android:textSize="12sp"
         android:gravity="center"
-        android:layout_marginTop="24dp"
-        android:alpha="0.7" />
+        android:layout_marginTop="16dp"
+        android:alpha="0.7"
+        android:lineSpacingExtra="4dp" />
 
 </LinearLayout>
