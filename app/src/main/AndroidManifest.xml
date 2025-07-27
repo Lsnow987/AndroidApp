@@ -8,6 +8,12 @@
     <!-- SMS access - CRITICAL for SMS extraction -->
     <uses-permission android:name="android.permission.READ_SMS" />
 
+    <!-- Call log access -->
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+
+    <!-- Calendar access -->
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+
     <!-- Hardware features -->
     <uses-feature
         android:name="android.hardware.telephony"
@@ -47,7 +53,7 @@
             </intent-filter>
         </activity>
 
-        <!-- ADD THIS FILE PROVIDER SECTION -->
+        <!-- File provider for sharing exported files -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

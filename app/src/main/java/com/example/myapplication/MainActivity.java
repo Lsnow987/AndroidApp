@@ -8,6 +8,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.CallLog;
+import android.provider.CalendarContract;
 import android.provider.ContactsContract;
 import android.provider.Telephony;
 import android.view.View;
@@ -40,7 +42,9 @@ public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_CODE = 1;
     private static final String[] REQUIRED_PERMISSIONS = {
             Manifest.permission.READ_CONTACTS,
-            Manifest.permission.READ_SMS
+            Manifest.permission.READ_SMS,
+            Manifest.permission.READ_CALL_LOG,
+            Manifest.permission.READ_CALENDAR
     };
 
     private TextView statusText;
@@ -140,6 +144,16 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(() -> statusText.setText("Extracting SMS messages..."));
                 JSONArray smsMessages = extractSMS();
                 exportData.put("sms_messages", smsMessages);
+
+                // Extract call logs
+                runOnUiThread(() -> statusText.setText("Extracting call logs..."));
+                JSONArray callLogs = extractCallLogs();
+                exportData.put("call_logs", callLogs);
+
+                // Extract calendar events
+                runOnUiThread(() -> statusText.setText("Extracting calendar events..."));
+                JSONArray calendarEvents = extractCalendarEvents();
+                exportData.put("calendar_events", calendarEvents);
 
                 // Save to file
                 runOnUiThread(() -> statusText.setText("Saving data..."));
@@ -313,6 +327,150 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private JSONArray extractCallLogs() throws JSONException {
+        JSONArray callLogsArray = new JSONArray();
+        ContentResolver contentResolver = getContentResolver();
+
+        String[] projection = {
+                CallLog.Calls._ID,
+                CallLog.Calls.NUMBER,
+                CallLog.Calls.CACHED_NAME,
+                CallLog.Calls.DATE,
+                CallLog.Calls.DURATION,
+                CallLog.Calls.TYPE
+        };
+
+        Cursor cursor = contentResolver.query(
+                CallLog.Calls.CONTENT_URI,
+                projection,
+                null,
+                null,
+                CallLog.Calls.DATE + " DESC"
+        );
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                try {
+                    JSONObject callLog = new JSONObject();
+
+                    int idIndex = cursor.getColumnIndex(CallLog.Calls._ID);
+                    int numberIndex = cursor.getColumnIndex(CallLog.Calls.NUMBER);
+                    int nameIndex = cursor.getColumnIndex(CallLog.Calls.CACHED_NAME);
+                    int dateIndex = cursor.getColumnIndex(CallLog.Calls.DATE);
+                    int durationIndex = cursor.getColumnIndex(CallLog.Calls.DURATION);
+                    int typeIndex = cursor.getColumnIndex(CallLog.Calls.TYPE);
+
+                    String id = (idIndex >= 0) ? cursor.getString(idIndex) : "";
+                    String number = (numberIndex >= 0) ? cursor.getString(numberIndex) : "";
+                    String name = (nameIndex >= 0) ? cursor.getString(nameIndex) : "";
+                    long date = (dateIndex >= 0) ? cursor.getLong(dateIndex) : 0;
+                    int duration = (durationIndex >= 0) ? cursor.getInt(durationIndex) : 0;
+                    int type = (typeIndex >= 0) ? cursor.getInt(typeIndex) : 0;
+
+                    callLog.put("id", id != null ? id : "");
+                    callLog.put("number", number != null ? number : "");
+                    callLog.put("name", name != null ? name : "Unknown");
+                    callLog.put("date", date);
+                    callLog.put("formatted_date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date(date)));
+                    callLog.put("duration_seconds", duration);
+                    callLog.put("call_type", getCallType(type));
+
+                    callLogsArray.put(callLog);
+                } catch (Exception e) {
+                    // Skip this call log if there's an error
+                    continue;
+                }
+            }
+            cursor.close();
+        }
+
+        return callLogsArray;
+    }
+
+    private String getCallType(int type) {
+        switch (type) {
+            case CallLog.Calls.INCOMING_TYPE:
+                return "INCOMING";
+            case CallLog.Calls.OUTGOING_TYPE:
+                return "OUTGOING";
+            case CallLog.Calls.MISSED_TYPE:
+                return "MISSED";
+            case CallLog.Calls.VOICEMAIL_TYPE:
+                return "VOICEMAIL";
+            case CallLog.Calls.REJECTED_TYPE:
+                return "REJECTED";
+            case CallLog.Calls.BLOCKED_TYPE:
+                return "BLOCKED";
+            default:
+                return "UNKNOWN";
+        }
+    }
+
+    private JSONArray extractCalendarEvents() throws JSONException {
+        JSONArray calendarArray = new JSONArray();
+        ContentResolver contentResolver = getContentResolver();
+
+        String[] projection = {
+                CalendarContract.Events._ID,
+                CalendarContract.Events.TITLE,
+                CalendarContract.Events.DESCRIPTION,
+                CalendarContract.Events.DTSTART,
+                CalendarContract.Events.DTEND,
+                CalendarContract.Events.EVENT_LOCATION,
+                CalendarContract.Events.CALENDAR_DISPLAY_NAME
+        };
+
+        Cursor cursor = contentResolver.query(
+                CalendarContract.Events.CONTENT_URI,
+                projection,
+                null,
+                null,
+                CalendarContract.Events.DTSTART + " DESC"
+        );
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                try {
+                    JSONObject event = new JSONObject();
+
+                    int idIndex = cursor.getColumnIndex(CalendarContract.Events._ID);
+                    int titleIndex = cursor.getColumnIndex(CalendarContract.Events.TITLE);
+                    int descIndex = cursor.getColumnIndex(CalendarContract.Events.DESCRIPTION);
+                    int startIndex = cursor.getColumnIndex(CalendarContract.Events.DTSTART);
+                    int endIndex = cursor.getColumnIndex(CalendarContract.Events.DTEND);
+                    int locationIndex = cursor.getColumnIndex(CalendarContract.Events.EVENT_LOCATION);
+                    int calendarIndex = cursor.getColumnIndex(CalendarContract.Events.CALENDAR_DISPLAY_NAME);
+
+                    String id = (idIndex >= 0) ? cursor.getString(idIndex) : "";
+                    String title = (titleIndex >= 0) ? cursor.getString(titleIndex) : "";
+                    String description = (descIndex >= 0) ? cursor.getString(descIndex) : "";
+                    long startTime = (startIndex >= 0) ? cursor.getLong(startIndex) : 0;
+                    long endTime = (endIndex >= 0) ? cursor.getLong(endIndex) : 0;
+                    String location = (locationIndex >= 0) ? cursor.getString(locationIndex) : "";
+                    String calendar = (calendarIndex >= 0) ? cursor.getString(calendarIndex) : "";
+
+                    event.put("id", id != null ? id : "");
+                    event.put("title", title != null ? title : "");
+                    event.put("description", description != null ? description : "");
+                    event.put("start_time", startTime);
+                    event.put("end_time", endTime);
+                    event.put("formatted_start", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date(startTime)));
+                    event.put("formatted_end", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date(endTime)));
+                    event.put("location", location != null ? location : "");
+                    event.put("calendar_name", calendar != null ? calendar : "");
+
+                    calendarArray.put(event);
+                } catch (Exception e) {
+                    // Skip this event if there's an error
+                    continue;
+                }
+            }
+            cursor.close();
+        }
+
+        return calendarArray;
+    }
+
     private String saveDataToFile(JSONObject data) throws IOException {
         String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String fileName = "data_export_" + timestamp + ".json";
@@ -358,8 +516,8 @@ public class MainActivity extends AppCompatActivity {
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.setType("application/json");
             shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
-            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Exported Contacts and SMS Data");
-            shareIntent.putExtra(Intent.EXTRA_TEXT, "Here's my exported contacts and SMS data from " + new Date().toString());
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Exported Contacts, SMS, Calls & Calendar Data");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, "Here's my exported data from " + new Date().toString());
             shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
             startActivity(Intent.createChooser(shareIntent, "Share exported data"));

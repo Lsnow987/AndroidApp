@@ -37,7 +37,7 @@
         android:id="@+id/extractButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Extract Contacts &amp; SMS"
+        android:text="Extract All Data (Contacts, SMS, Calls, Calendar)"
         android:enabled="false"
         android:layout_marginBottom="16dp" />
 
@@ -52,7 +52,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Note: Extracted data will be saved to your device's Documents folder as a JSON file."
+        android:text="Note: Extracts contacts, SMS messages, call logs, and calendar events. Data saved as JSON file."
         android:textSize="12sp"
         android:gravity="center"
         android:layout_marginTop="24dp"
